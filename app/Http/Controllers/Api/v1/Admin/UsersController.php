@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -16,9 +17,13 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->get();
+        $roles = $request->has('roles') ? array_map('intval', explode(',', $request->get('roles'))) : Role::pluck('id')->all();
+        $users = User::latest()
+            ->byRoles($roles)
+            ->get();
+
         return $this->getResponseFactory()->giveSuccessResponse($users);
     }
 
@@ -30,11 +35,13 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge(['role_id' => $request->input('role.id'), 'password' => Hash::make('password')]);
+        $request->merge(['role_id' => $request->input('role.id'), 'password' => Hash::make($request->password)]);
         //just set default password to password!
         $payload = $request->only('email', 'name', 'role_id', 'password');
 
         $user = User::create($payload);
+        $user->load('role');
+
         return $this->getResponseFactory()->giveSuccessResponse($user);
     }
 
@@ -65,6 +72,7 @@ class UsersController extends Controller
             $request->merge(['role_id' => $request->input('role.id')]);
             $payload = $request->only('email', 'name', 'role_id');
             $user->update($payload);
+            $user->load('role');
 
             return $this->getResponseFactory()->giveSuccessResponse($user, Response::HTTP_OK, 'User successfully saved.');
 

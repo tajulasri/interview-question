@@ -1,6 +1,6 @@
 
 <template>
-  <v-fragment name="dashboard">
+  <v-fragment name="users">
     <navigation-menu :role="user.role_id"></navigation-menu>
 
     <div v-if="showEditModal">
@@ -17,7 +17,7 @@
                     data-dismiss="modal"
                     aria-label="Close"
                   >
-                    <span aria-hidden="true" @click="showEditModal = false"
+                    <span aria-hidden="true" @click="closeEditModal()"
                       >&times;</span
                     >
                   </button>
@@ -49,7 +49,6 @@
                   <div class="form-group col-12 row">
                     <label for="name">Roles</label>
                     <select
-                      name="role_id"
                       id="roleId"
                       class="form-control"
                       v-model="userForm.role"
@@ -68,7 +67,7 @@
                   <button
                     type="button"
                     class="btn btn-secondary"
-                    @click="showEditModal = false"
+                    @click="closeEditModal()"
                   >
                     Close
                   </button>
@@ -88,7 +87,7 @@
     </div>
 
     <div v-if="showModal">
-      <transition name="modal">
+      <transition name="addusermodal">
         <div class="modal-mask">
           <div class="modal-wrapper">
             <div class="modal-dialog modal-lg" role="document">
@@ -101,7 +100,7 @@
                     data-dismiss="modal"
                     aria-label="Close"
                   >
-                    <span aria-hidden="true" @click="showModal = false"
+                    <span aria-hidden="true" @click="closeModal()"
                       >&times;</span
                     >
                   </button>
@@ -131,6 +130,33 @@
                   </div>
 
                   <div class="form-group col-12 row">
+                    <label for="name">Password</label>
+                    <input
+                      type="password"
+                      id="name"
+                      class="form-control"
+                      v-model="userForm.password"
+                      placeholder="User's account password."
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group col-12 row">
+                    <label for="name">Password confirmation</label>
+                    <input
+                      type="password"
+                      id="name"
+                      class="form-control"
+                      v-model="userForm.password_confirmation"
+                      placeholder="Confirm user's password"
+                      required
+                    />
+                    <span class="text-danger" v-if="passwordNotMatch"
+                      >Password did not match.</span
+                    >
+                  </div>
+
+                  <div class="form-group col-12 row">
                     <label for="name">Roles</label>
                     <select
                       name="role_id"
@@ -152,7 +178,7 @@
                   <button
                     type="button"
                     class="btn btn-secondary"
-                    @click="showModal = false"
+                    @click="closeModal()"
                   >
                     Close
                   </button>
@@ -174,6 +200,7 @@
     <div id="container col-8" style="margin-top: 3em">
       <notifications group="success" />
       <notifications group="error" />
+
       <div id="content" class="col-8 offset-md-2">
         <div class="card card-default">
           <div class="card-header"><span>Manage Users</span></div>
@@ -185,51 +212,55 @@
             >
               <button class="btn btn-primary">Create user</button>
             </div>
-            <table class="table table-condensed table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Created At</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="users.length == 0">
-                  <td colspan="10" class="text-center">No data available</td>
-                </tr>
-                <tr v-for="(user, index) in users">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.role.name }}</td>
-                  <td>{{ user.created_at }}</td>
-                  <td>
-                    <div class="btn-group">
-                      <button
-                        type="button"
-                        class="btn btn-primary dropdown-toggle"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        Action
-                      </button>
-                      <div class="dropdown-menu">
-                        <a class="dropdown-item" @click="editUser(index)"
-                          >Edit</a
+            <div class="table-responsive">
+              <table
+                class="table table-condensed table-bordered table-hover responsive"
+              >
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="users.length == 0">
+                    <td colspan="10" class="text-center">No data available</td>
+                  </tr>
+                  <tr v-for="(user, index) in users">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.role.name }}</td>
+                    <td>{{ user.created_at }}</td>
+                    <td>
+                      <div class="btn-group">
+                        <button
+                          type="button"
+                          class="btn btn-primary dropdown-toggle"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
                         >
-                        <a class="dropdown-item" @click="removeUser(index)"
-                          >Delete</a
-                        >
+                          Action
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" @click="editUser(index)"
+                            >Edit</a
+                          >
+                          <a class="dropdown-item" @click="removeUser(index)"
+                            >Delete</a
+                          >
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -246,7 +277,7 @@ export default {
   mounted() {
     this.getUser()
       .then((response) => {
-        this.user = response.data;
+        this.user = response.data.data;
       })
       .catch((error) => console.log(error.toString()));
 
@@ -265,43 +296,77 @@ export default {
     return {
       showModal: false,
       showEditModal: false,
+      passwordNotMatch: false,
       loading: false,
       user: null,
       users: [],
       roles: [
-        { id: 1, name: "admin" },
-        { id: 2, name: "customer" },
+        { id: 1, name: "administrator" },
+        { id: 2, name: "user" },
       ],
-      userForm: { email: null, name: null, role: null },
+      userForm: {
+        email: null,
+        name: null,
+        role: null,
+        password: null,
+        password_confirmation: null,
+      },
     };
   },
   methods: {
+    closeEditModal() {
+      this.showEditModal = false;
+      this.resetForm();
+    },
+    closeModal() {
+      this.showModal = false;
+      this.resetForm();
+    },
     adduser() {
-      //replace server state to local states
-      axios
-        .post("v1/admin/users", this.userForm, {
-          headers: {
-            Authorization: `Bearer ${this.getAuthToken()}`,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
+      if (
+        this.userForm.password == "" ||
+        this.userForm.password_confirmation == "" ||
+        this.userForm.password != this.userForm.password_confirmation
+      ) {
+        this.passwordNotMatch = true;
+        setTimeout(() => (this.passwordNotMatch = false), 2000);
+      } else {
+        axios
+          .post("v1/admin/users", this.userForm, {
+            headers: {
+              Authorization: `Bearer ${this.getAuthToken()}`,
+            },
+          })
+          .then((response) => {
+            this.users = [...this.users, response.data.data];
 
-          this.resetForm();
-          this.users.push(this.response.data);
-          this.showModal = false;
+            this.closeModal();
 
-          this.$notify({
-            group: "success",
-            type: "success",
-            title: "Success",
-            text: "New user added.",
+            this.$notify({
+              group: "success",
+              type: "success",
+              title: "Success",
+              text: "New user added.",
+            });
+          })
+          .catch((error) => {
+            this.$notify({
+              group: "error",
+              type: "error",
+              title: "Error",
+              text: error.toString(),
+            });
           });
-        })
-        .catch((error) => {});
+      }
     },
     resetForm() {
-      this.userForm = { email: null, name: null };
+      this.userForm = {
+        email: null,
+        name: null,
+        role: this.roles[1],
+        password: null,
+        password_confirmation: null,
+      };
     },
     removeUser(index) {
       const user = this.users[index];
@@ -328,41 +393,16 @@ export default {
           headers: { Authorization: `Bearer ${this.getAuthToken()}` },
         })
         .then((response) => {
-          this.resetForm();
-          this.showEditModal = false;
+          this.closeEditModal();
 
           this.$notify({
             group: "success",
             type: "success",
             title: "Success",
             text: "User details saved and changed.",
-          }).catch((error) => {});
-        });
-
-      //replace server state to local states
-    },
-    updateProfile() {
-      axios
-        .put("v1/me/param", this.user, {
-          headers: { Authorization: `Bearer ${this.getAuthToken()}` },
-        })
-        .then((response) => {
-          console.log(response.data);
-          this.$notify({
-            group: "success",
-            type: "success",
-            title: "Success",
-            text: response.data.message,
           });
         })
-        .catch((error) => {
-          this.$notify({
-            group: "error",
-            title: "Unable to proceed.",
-            type: "error",
-            text: error.toString(),
-          });
-        });
+        .catch((error) => {});
     },
   },
   components: {

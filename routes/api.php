@@ -29,7 +29,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::resource('me', ProfileController::class)->middleware('auth:api');
     Route::post('changepassword', ChangePasswordController::class);
 
-    Route::group(['prefix' => 'admin'], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['roles.admin', 'auth:api']], function () {
         Route::resource('users', UsersController::class);
     });
 });

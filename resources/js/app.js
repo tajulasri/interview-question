@@ -1,13 +1,13 @@
-import 'es6-promise/auto'
-import axios from 'axios'
-import Vue from 'vue'
-import VueAxios from 'vue-axios'
-import VueRouter from 'vue-router'
-import Home from './pages/Home'
-import router from './router'
+import 'es6-promise/auto';
+import axios from 'axios';
+import Vue from 'vue';
+import VueAxios from 'vue-axios';
+import VueRouter from 'vue-router';
+import Home from './pages/Home';
+import router from './router';
 import AppMixins from './services/appMixins';
-import Notifications from 'vue-notification'
-import { Plugin } from "vue-fragment"; 
+import Notifications from 'vue-notification';
+import { Plugin } from "vue-fragment";
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -33,15 +33,15 @@ window.Vue = require('vue').default;
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('loading-component', require('./components/LoadingComponent.vue').default);
 
-Vue.router = router
-Vue.use(VueRouter)
-Vue.use(VueAxios, axios)
-Vue.use(Notifications)
-Vue.use(Plugin);
+Vue.router = router;
+Vue.use(VueRouter);
+Vue.use(VueAxios, axios);
+Vue.use(Notifications);
+// Vue.use(Plugin);
 
-axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`
+axios.defaults.baseURL = `${process.env.MIX_APP_URL}/api`;
 // Load Index
-Vue.component('home', Home)
+Vue.component('home', Home);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -50,6 +50,6 @@ Vue.component('home', Home)
  */
 const app = new Vue({
     el: '#app',
-    mixin:[AppMixins],
+    mixin: [AppMixins],
     router
 });

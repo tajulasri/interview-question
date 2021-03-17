@@ -18,8 +18,6 @@ class ProfileController extends Controller
     public function index()
     {
         $user = $this->getCurrentUser();
-        return auth('api')->user();
-
         return $this->getResponseFactory()->giveSuccessResponse($user);
     }
 

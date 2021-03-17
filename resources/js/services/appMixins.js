@@ -2,21 +2,21 @@
 import axios from 'axios';
 
 export default {
-created: function () {
-    this.hello()
-  },  
+  created: function () {
+    this.hello();
+  },
   methods: {
     hello: function () {
-      console.log('hello from mixin!')
+      console.log('hello from mixin!');
     },
-    isLoggedIn: function() {
+    isLoggedIn: function () {
       return this.getAuthToken() != null ? true : false;
     },
-    getUser: function() {
-       return axios.get('/v1/me',{headers: {'Authorization': `Bearer ${this.getAuthToken()}`}});
+    getUser: function () {
+      return axios.get('/v1/me', { headers: { 'Authorization': `Bearer ${this.getAuthToken()}` } });
     },
-    getAuthToken: function(){
-        return localStorage.getItem('token');
+    getAuthToken: function () {
+      return localStorage.getItem('token');
     }
   }
-}
+};

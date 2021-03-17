@@ -43,17 +43,15 @@ class ApiEndpointTest extends TestCase
 
     public function test_user_get_profile_api_endpoint()
     {
-        //move this to boot event later
         $user = User::first();
+
         $response = $this->withHeaders([
             'Authorization' => $this->buildAuthorizationHeader($this->getAuthToken($user)),
         ])
             ->get('/api/v1/me');
-        
-        dd($response->getContent());
-        
+
         $response->assertStatus(200)
-            ->assertJson(['data' => [], 'status_code' => Response::HTTP_OK]);
+            ->assertJson(['data' => ['role' => []], 'status_code' => Response::HTTP_OK]);
 
     }
 

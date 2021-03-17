@@ -87,6 +87,7 @@ export default {
         })
         .catch((error) => {
           app.has_error = true;
+          app.loading = false;
           app.error = error.toString();
         });
     },
