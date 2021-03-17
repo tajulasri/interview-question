@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\v1\Admin\UsersController;
 use App\Http\Controllers\Api\v1\ChangePasswordController;
 use App\Http\Controllers\Api\v1\LoginController;
 use App\Http\Controllers\Api\v1\LogoutController;
@@ -27,4 +28,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('logout', LogoutController::class);
     Route::resource('me', ProfileController::class)->middleware('auth:api');
     Route::post('changepassword', ChangePasswordController::class);
+
+    Route::group(['prefix' => 'admin'], function () {
+        Route::resource('users', UsersController::class);
+    });
 });

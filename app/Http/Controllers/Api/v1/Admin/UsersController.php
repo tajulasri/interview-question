@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api\v1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 
 class UsersController extends Controller
 {
@@ -14,24 +18,30 @@ class UsersController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::latest()->get();
+        return $this->getResponseFactory()->giveSuccessResponse($users);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request    $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        $request->merge(['role_id' => $request->input('role.id'), 'password' => Hash::make('password')]);
+        //just set default password to password!
+        $payload = $request->only('email', 'name', 'role_id', 'password');
+
+        $user = User::create($payload);
+        return $this->getResponseFactory()->giveSuccessResponse($user);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int                         $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -42,23 +52,49 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request    $request
+     * @param  int                         $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
+
+        try {
+
+            $user = User::findOrFail($id);
+            $request->merge(['role_id' => $request->input('role.id')]);
+            $payload = $request->only('email', 'name', 'role_id');
+            $user->update($payload);
+
+            return $this->getResponseFactory()->giveSuccessResponse($user, Response::HTTP_OK, 'User successfully saved.');
+
+        } catch (ModelNotFoundException $e) {
+
+            return $this->getResponseFactory()->giveErrorResponse('Resource not found.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int                         $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        try {
+
+            $user = User::findOrFail($id);
+            $snapshot = $user;
+            $user->delete();
+
+            //instead of we returning no content response to frontend.
+            //we give old snapshot to frontend response for further usage.eg: used to display message.
+            return $this->getResponseFactory()->giveSuccessResponse($snapshot, Response::HTTP_OK, 'User successfully removed.');
+
+        } catch (ModelNotFoundException $e) {
+
+            return $this->getResponseFactory()->giveErrorResponse('Resource not found.');
+        }
     }
 }

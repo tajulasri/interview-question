@@ -49,9 +49,11 @@ class ApiEndpointTest extends TestCase
             'Authorization' => $this->buildAuthorizationHeader($this->getAuthToken($user)),
         ])
             ->get('/api/v1/me');
-
-        $response->assertStatus(200);
-            //->assertJson(['data' => [], 'status_code' => Response::HTTP_OK]);
+        
+        dd($response->getContent());
+        
+        $response->assertStatus(200)
+            ->assertJson(['data' => [], 'status_code' => Response::HTTP_OK]);
 
     }
 
