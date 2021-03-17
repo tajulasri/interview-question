@@ -10,7 +10,8 @@
 1) copy `.env.example` to `.env`
 2) Create and setup database.
 3) `php artisan migrate --seed && php artisan passport:install`
-4) `php artisan serve`
+4) `npm install && npm run dev`
+5) `php artisan key:generate && php artisan serve`
 
 ##### App is hosted at http://localhost:8000
 
